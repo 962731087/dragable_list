@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Sortable List</title>
+  <style>
+    .sortable {
+      cursor: move;
+    }
+  </style>
+</head>
+<body>
+  <ul id="sortableList">
+    <li class="sortable">Item 1</li>
+    <li class="sortable">Item 2</li>
+    <li class="sortable">Item 3</li>
+    <li class="sortable">Item 4</li>
+  </ul>
+
+  <script>
+    const sortableList = document.getElementById("sortableList");
+    let draggedItem = null;
+
+    // 监听开始拖拽事件
+    function handleDragStart(e) {
+      draggedItem = this;
+      // 使拖动的元素半透明
+      this.style.opacity = "0.6";
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/html", this.innerHTML);
+    }
+
+    // 监听拖拽进入元素事件
+    function handleDragEnter(e) {
+      if (e.preventDefault) {
+        e.preventDefault();
+      }
+      this.classList.add("over");
+    }
+
+    // 监听拖拽结束事件
+    function handleDragEnd(e) {
+      draggedItem.style.opacity = "1";
+      this.classList.remove("over");
+      // 重置拖动的项目为null
+      draggedItem = null;
+    }
+
+    // 监听拖拽放置事件
+    function handleDrop(e) {
+      if (e.stopPropagation) {
+        e.stopPropagation();
+      }
+      if (draggedItem !== this) {
+        draggedItem.innerHTML = this.innerHTML;
+        this.innerHTML = e.dataTransfer.getData("text/html");
+      }
+      return false;
+    }
+
+    // 监听拖拽进入离开事件
+    function handleDragLeave(e) {
+      this.classList.remove("over");
+    }
+
+    const items = document.querySelectorAll(".sortable");
+    items.forEach(item => {
+      item.addEventListener("dragstart", handleDragStart, false);
+      item.addEventListener("dragenter", handleDragEnter, false);
+      item.addEventListener("dragend", handleDragEnd, false);
+      item.addEventListener("dragover", function(e) {
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+        e.dataTransfer.dropEffect = "move";
+        return false;
+      }, false);
+      item.addEventListener("drop", handleDrop, false);
+      item.addEventListener("dragleave", handleDragLeave, false);
+    });
+  </script>
+</body>
+</html>
